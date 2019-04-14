@@ -15,20 +15,10 @@ from transformer.my_iterator import MyIterator, rebatch
 from transformer.noam_opt import NoamOpt
 
 from pytorch_pretrained_bert import OpenAIGPTTokenizer
+from utils import get_arg_tokenizer, whitespace_tokenizer, get_pretrained_embeddings
 
 # GPUs to use
 devices = [torch.device("cuda" if torch.cuda.is_available() else "cpu")]  # Or use [0, 1] etc for multiple GPUs
-
-def get_arg_tokenizer():
-    tokenizer = OpenAIGPTTokenizer.from_pretrained('openai-gpt')
-    max_key = max(tokenizer.encoder.values())
-    add_toks = ['argonestart', 'argoneend', 'relstart', 'relend', 'argtwostart', 'argtwoend']
-    word_piece = '</w>'
-    for ix, tok in enumerate(add_toks):
-        tokenizer.encoder[tok + word_piece] = max_key + 1 + ix
-        tokenizer.decoder[max_key + 1 + ix] = tok + word_piece
-        tokenizer.cache[tok] = tok + word_piece
-    return tokenizer
 
 def get_dataset(train_path):
     tokenizer = get_arg_tokenizer()
@@ -37,8 +27,8 @@ def get_dataset(train_path):
     EOS_WORD = '</s>'
     PAD_WORD = '<pad>'
     
-    SRC = data.Field(tokenize=tokenizer.tokenize, pad_token=PAD_WORD)
-    TGT = data.Field(tokenize=tokenizer.tokenize, init_token=BOS_WORD,
+    SRC = data.Field(tokenize=whitespace_tokenizer, pad_token=PAD_WORD)
+    TGT = data.Field(tokenize=whitespace_tokenizer, init_token=BOS_WORD,
                     eos_token=EOS_WORD, pad_token=PAD_WORD)
 
 
@@ -61,7 +51,7 @@ def train(
     train_path,
     save_path,
     n_layers = 6,
-    model_dim = 512,
+    model_dim = 768,
     feedforward_dim = 2048,
     n_heads = 8,
     dropout_rate = 0.1,
@@ -71,15 +61,21 @@ def train(
     max_val_outputs = 20):
 
     train, val, TGT, SRC, pad_idx, EOS_WORD, BOS_WORD, PAD_WORD = get_dataset(train_path)
+    
+    embed_array = get_pretrained_embeddings(SRC.vocab)
 
     model = make_model(len(SRC.vocab), len(TGT.vocab),
                          n=n_layers, d_model=model_dim,
                          d_ff=feedforward_dim, h=n_heads,
                          dropout=dropout_rate)
+    
+    weight = torch.FloatTensor(embed_array)
+    model.src_embed[0].lut = nn.Embedding.from_pretrained(weight)
+
     model.cuda()
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=pad_idx, smoothing=0.1)
     criterion.cuda()
-    BATCH_SIZE = 2048   
+    BATCH_SIZE = 512  
     train_iter = MyIterator(train, batch_size=BATCH_SIZE, device=0, repeat=False, #Faster with device warning
                             sort_key=lambda x: (len(x.src), len(x.trg)), batch_size_fn=batch_size_fn, train=True)
     valid_iter = MyIterator(val, batch_size=BATCH_SIZE, device=0, repeat=False,
@@ -97,7 +93,7 @@ def train(
         model_par.eval()
         loss = run_epoch((rebatch(pad_idx, b) for b in valid_iter), model_par,
                          MultiGPULossCompute(model.generator, criterion, devices=devices, opt=None))
-        print(loss)
+        print('Evaluation loss:', loss)
 
     for i, batch in enumerate(valid_iter):
         if i > max_val_outputs:
@@ -122,10 +118,10 @@ def train(
 
 
 if __name__ == '__main__':
-    train_path = 'data/data200k.csv'
-    save_path = 'models/noie_transformer'
+    train_path = 'data/whitespace_1mil.csv'
+    save_path = 'models/noie_transformer_gptweights'
     n_layers = 5 #for encoder and decoder
-    model_dim = 300
+    model_dim = 768
     feedforward_dim = 1024
     n_heads = 4
     dropout_rate = 0.1
