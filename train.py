@@ -78,7 +78,7 @@ def train(
     model.cuda()
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=pad_idx, smoothing=0.1)
     criterion.cuda()
-    BATCH_SIZE = 2048
+    BATCH_SIZE = 5000
     train_iter = MyIterator(train, batch_size=BATCH_SIZE, device=0, repeat=False, #Faster with device warning
                             sort_key=lambda x: (len(x.src), len(x.trg)), batch_size_fn=batch_size_fn, train=True)
     # valid_iter = MyIterator(val, batch_size=BATCH_SIZE, device=0, repeat=False,
@@ -121,7 +121,7 @@ def train(
 
 
 if __name__ == '__main__':
-    train_path = 'data/whitespace_full.csv'
+    train_path = 'data/whitespace_1mil.csv'
     save_path = 'models/noie_full_6heads_2048ff'
     n_layers = 5 #for encoder and decoder
     model_dim = 768
