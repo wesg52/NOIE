@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # date: 2018-12-02 20:54
-import spacy
 import torch
 import torch.nn as nn
 from torchtext import data, datasets
