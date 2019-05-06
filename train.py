@@ -124,7 +124,7 @@ if __name__ == '__main__':
     save_path = 'models/noie_full_6heads_2048ff'
     n_layers = 5 #for encoder and decoder
     model_dim = 768
-    feedforward_dim = 2048
+    feedforward_dim = 1200
     n_heads = 6
     dropout_rate = 0.1
     n_epochs = 10
