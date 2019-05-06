@@ -77,7 +77,7 @@ def train(
     model.cuda()
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=pad_idx, smoothing=0.1)
     criterion.cuda()
-    BATCH_SIZE = 5000
+    BATCH_SIZE = 10000
     train_iter = MyIterator(train, batch_size=BATCH_SIZE, device=0, repeat=False, #Faster with device warning
                             sort_key=lambda x: (len(x.src), len(x.trg)), batch_size_fn=batch_size_fn, train=True)
     # valid_iter = MyIterator(val, batch_size=BATCH_SIZE, device=0, repeat=False,
