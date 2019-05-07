@@ -16,7 +16,7 @@ def get_testset(train_path):
     EOS_WORD = '</s>'
     PAD_WORD = '<pad>'
     
-    SRC = data.Field(tokenize=whitespace_tokenizer, pad_token=PAD_WORD)
+    SRC = data.Field(tokenize=tokenizer, pad_token=PAD_WORD)
 
 
     data_fields = [('src', SRC)]
