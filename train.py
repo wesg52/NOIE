@@ -38,8 +38,8 @@ def get_dataset(train_path):
                                fields=data_fields,
                                skip_header=True)
     
-    SRC.build_vocab(full, min_freq=10)
-    TGT.build_vocab(full, min_freq=10)
+    #SRC.build_vocab(full, min_freq=10)
+    #TGT.build_vocab(full, min_freq=10)
     
     
     pad_idx = TGT.vocab.stoi[PAD_WORD]
@@ -70,9 +70,12 @@ def train(
     
     weight = torch.FloatTensor(embed_array)
     model.src_embed[0].lut = nn.Embedding.from_pretrained(weight)
+    model.load_state_dict(torch.load('models/noie_full_6heads_2048ff_epoch4'))
 
-    torch.save(SRC.vocab, save_path + 'src_vocab.pt')
-    torch.save(TGT.vocab, save_path + 'trg_vocab.pt')
+    #torch.save(SRC.vocab, save_path + 'src_vocab.pt')
+    #torch.save(TGT.vocab, save_path + 'trg_vocab.pt')
+    SRC.vocab = torch.load('models/src_vocab.pt')
+    TGT.vocab = torch.load('models/trg_vocab.pt')
 
     model.cuda()
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=pad_idx, smoothing=0.1)
@@ -121,7 +124,7 @@ def train(
 
 if __name__ == '__main__':
     train_path = 'data/whitespace_1mil.csv'
-    save_path = 'models/noie_full_6heads_2048ff'
+    save_path = 'models/noie_full_1200ff_6heads'
     n_layers = 5 #for encoder and decoder
     model_dim = 768
     feedforward_dim = 1200
