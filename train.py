@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # date: 2018-12-02 20:54
-import spacy
 import torch
 import torch.nn as nn
 from torchtext import data, datasets
@@ -78,7 +77,7 @@ def train(
     model.cuda()
     criterion = LabelSmoothing(size=len(TGT.vocab), padding_idx=pad_idx, smoothing=0.1)
     criterion.cuda()
-    BATCH_SIZE = 2048
+    BATCH_SIZE = 8000
     train_iter = MyIterator(train, batch_size=BATCH_SIZE, device=0, repeat=False, #Faster with device warning
                             sort_key=lambda x: (len(x.src), len(x.trg)), batch_size_fn=batch_size_fn, train=True)
     # valid_iter = MyIterator(val, batch_size=BATCH_SIZE, device=0, repeat=False,
@@ -92,7 +91,7 @@ def train(
         run_epoch((rebatch(pad_idx, b) for b in train_iter), model_par,
                   MultiGPULossCompute(model.generator, criterion, devices=devices, opt=model_opt))
         save_name = save_path + '_epoch' + str(epoch) + '.pt'
-        torch.save(model, save_name)
+        torch.save(model.state_dict(), save_name)
     #     model_par.eval()
     #     loss = run_epoch((rebatch(pad_idx, b) for b in valid_iter), model_par,
     #                      MultiGPULossCompute(model.generator, criterion, devices=devices, opt=None))
@@ -121,11 +120,11 @@ def train(
 
 
 if __name__ == '__main__':
-    train_path = 'data/whitespace_full.csv'
+    train_path = 'data/whitespace_1mil.csv'
     save_path = 'models/noie_full_6heads_2048ff'
     n_layers = 5 #for encoder and decoder
     model_dim = 768
-    feedforward_dim = 2048
+    feedforward_dim = 1200
     n_heads = 6
     dropout_rate = 0.1
     n_epochs = 10
