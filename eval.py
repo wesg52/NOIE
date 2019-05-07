@@ -25,7 +25,7 @@ def get_testset(train_path):
                                path= train_path,
                                fields=data_fields,
                                skip_header=True)
-    SRC.build_vocab(full, min_freq=10)
+    #SRC.build_vocab(full, min_freq=10)
     return full, SRC, EOS_WORD, BOS_WORD, PAD_WORD
 
 def batch_size_fn2(new, count, size_so_far):
@@ -53,6 +53,7 @@ if __name__ == '__main__':
 
     # Load testing data
     test, SRC, EOS_WORD, BOS_WORD, PAD_WORD = get_testset('./all.txt')
+    SRC.vocab = vocab_src
 
     test_iter = MyIterator(test, batch_size=BATCH_SIZE, device=0, repeat=False, sort_key=lambda x: (len(x.src)), batch_size_fn=batch_size_fn2, train=False)
 
