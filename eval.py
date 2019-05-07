@@ -57,7 +57,7 @@ if __name__ == '__main__':
 
     test_iter = MyIterator(test, batch_size=BATCH_SIZE, device=0, repeat=False, sort_key=lambda x: (len(x.src)), batch_size_fn=batch_size_fn2, train=False)
 
-    testFile = open('./results.txt', 'w', encoding="utf-8")
+    test_file = open('./results.txt', 'w', encoding="utf-8")
     print('Extraction starts\n')
     for i, batch in enumerate(test_iter):
         if i > MAX_OUTPUTS:
@@ -71,8 +71,8 @@ if __name__ == '__main__':
             if sym == EOS_WORD:
                 break
             sent += sym + ' '
-        testFile.write(sent + "\n")
-    testFile.close()
+        test_file.write(sent + "\n")
+    test_file.close()
     print('Extraction complete')
 
 
