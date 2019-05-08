@@ -59,10 +59,11 @@ def train(
     min_freq = 10,
     max_val_outputs = 20):
 
-    train, TGT, SRC, pad_idx, EOS_WORD, BOS_WORD, PAD_WORD = get_dataset(train_path)
+    train, TGT, SRC, EOS_WORD, BOS_WORD, PAD_WORD = get_dataset(train_path)
     
     SRC.vocab = torch.load('models/src_vocab.pt')
     TGT.vocab = torch.load('models/trg_vocab.pt')
+    pad_idx = TGT.vocab.stoi[PAD_WORD]
 
     embed_array = get_pretrained_embeddings(SRC.vocab)
 
