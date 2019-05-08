@@ -20,7 +20,7 @@ from utils import get_arg_tokenizer, whitespace_tokenizer, get_pretrained_embedd
 devices = [torch.device("cuda" if torch.cuda.is_available() else "cpu")]  # Or use [0, 1] etc for multiple GPUs
 
 def get_dataset(train_path):
-    tokenizer = get_arg_tokenizer()
+    #tokenizer = get_arg_tokenizer()
 
     BOS_WORD = '<s>'
     EOS_WORD = '</s>'
@@ -126,7 +126,7 @@ def train(
 
 
 if __name__ == '__main__':
-    train_path = 'data/whitespace_1mil.csv'
+    train_path = 'data/full000.csv'
     save_path = 'models/noie_full_1200ff_6heads'
     n_layers = 5 #for encoder and decoder
     model_dim = 768
