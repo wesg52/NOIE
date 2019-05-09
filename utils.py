@@ -13,6 +13,17 @@ def get_arg_tokenizer():
         tokenizer.cache[tok] = tok + word_piece
     return tokenizer
 
+def get_arg_tokenizer_eval(text):
+    tokenizer = OpenAIGPTTokenizer.from_pretrained('openai-gpt')
+    max_key = max(tokenizer.encoder.values())
+    add_toks = ['argonestart', 'argoneend', 'relstart', 'relend', 'argtwostart', 'argtwoend']
+    word_piece = '</w>'
+    for ix, tok in enumerate(add_toks):
+        tokenizer.encoder[tok + word_piece] = max_key + 1 + ix
+        tokenizer.decoder[max_key + 1 + ix] = tok + word_piece
+        tokenizer.cache[tok] = tok + word_piece
+    return tokenizer.tokenize(text)
+
 def whitespace_tokenizer(text):
     return text.strip().split(" ")
 
