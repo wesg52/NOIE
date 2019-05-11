@@ -12,11 +12,11 @@ BATCH_SIZE = 2048
 MAX_OUTPUTS = 20
 
 # Relevant Files
-SRC_VOCABULARY = './noie_1mil_6heads_gptweightssrc_vocab.pt'
-TGT_VOCABULARY = './noie_1mil_6heads_gptweightstrg_vocab.pt'
-TRAINED_MODEL = './noie_1mil_6heads_gptweights_epoch5.pt'
+SRC_VOCABULARY = './models/noie_full_6heads_2048ffsrc_vocab.pt'
+TGT_VOCABULARY = './models/noie_full_6heads_2048fftrg_vocab.pt'
+TRAINED_MODEL = './models/noie_full_1200ff_6heads_r5_epoch0.pt'
 TESTING_FILE = './all.txt'
-OUTPUT_FILE = './output.txt'
+OUTPUT_FILE = './output_2.txt'
 
 def get_testset(train_path):
 
@@ -54,8 +54,14 @@ if __name__ == '__main__':
     # Put these files in the current directory first
     vocab_src = torch.load(SRC_VOCABULARY)
     vocab_tgt = torch.load(TGT_VOCABULARY)
+
+    model = make_model(len(vocab_src), len(vocab_tgt),
+                        n=5, d_model=768,
+                        d_ff=1200, h=6,
+                        dropout=.1)
     device = torch.device('cpu') # Ziwei uses CPU
-    model = torch.load(TRAINED_MODEL, map_location=device)
+    model.load_state_dict(torch.load(TRAINED_MODEL, map_location=device))
+    # model = torch.load(TRAINED_MODEL, map_location=device)
 
     model.eval()
 
