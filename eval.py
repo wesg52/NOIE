@@ -87,8 +87,8 @@ if __name__ == '__main__':
     #         sent += sym + ' '
     #     test_file.write(sent + "\n")
     for i in range(len(test_sents)):
-        if i == MAX_OUTPUTS:
-            break
+        # if i == MAX_OUTPUTS:
+        #     break
         sent = tok.tokenize(test_sents[i])
         src = torch.LongTensor([[vocab_src.stoi[w] for w in sent]])
         src = Variable(src)
