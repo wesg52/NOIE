@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+sed -e 's/argonestart<\/w>//g' -e 's/argoneend<\/w>//g' -e 's/argtwostart<\/w>//g' -e 's/argtwoend<\/w>//g' -e 's/relstart<\/w>/ /g' -e 's/relend<\/w>/ /g' -e 's/<s>//g' -e 's/<\/w>//g' -e "s/^[ \t]*//"< output_2.txt > extractions.txt
