@@ -15,16 +15,16 @@ class StanfordReader(OieReader):
             i = 0
             for line in fin:
                 data = line.strip().split('\t')
-                if len(data) == 3:
+                if len(data) == 4:
                     arg1, rel, arg2 = data[0:3]
-                elif len(data) == 2:
+                elif len(data) == 3:
                     arg1, rel = data[0:2]
                     arg2 = '<UNK>'
                 else:
                     arg1 = data[0]
                     arg2 = '<UNK>'
                     rel = '<UNK>'
-                confidence = 0.95
+                confidence = data[-1]
                 text = text_list[i]
                 i += 1
                 curExtraction = Extraction(pred = rel, sent = text, confidence = float(confidence))
